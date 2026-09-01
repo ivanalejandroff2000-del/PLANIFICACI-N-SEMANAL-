@@ -101,12 +101,29 @@
       opacity: 0.6;
     }
 
+    .secondary {
+      background: #16a34a;
+      margin-top: 12px;
+    }
+
+    .forgot {
+      background: transparent;
+      color: #2563eb;
+      padding: 10px;
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
     .message {
       margin-top: 16px;
       text-align: center;
       font-size: 14px;
       color: #dc2626;
       min-height: 20px;
+    }
+
+    .success {
+      color: #16a34a;
     }
 
     .hidden {
@@ -140,6 +157,7 @@
 
 <div class="container">
 
+  <!-- LOGIN -->
   <div id="loginCard" class="card">
 
     <div class="logo">📅</div>
@@ -174,12 +192,181 @@
         Iniciar sesión
       </button>
 
+      <button
+        id="forgotButton"
+        type="button"
+        class="forgot"
+      >
+        ¿Olvidaste tu contraseña?
+      </button>
+
+      <button
+        id="registerButton"
+        type="button"
+        class="secondary"
+      >
+        Crear cuenta
+      </button>
+
       <div id="message" class="message"></div>
 
     </form>
   </div>
 
 
+  <!-- REGISTRO -->
+  <div id="registerCard" class="card hidden">
+
+    <div class="logo">👤</div>
+
+    <h1>Crear cuenta</h1>
+
+    <div class="subtitle">
+      Registra tu cuenta para continuar
+    </div>
+
+    <form id="registerForm">
+
+      <label for="registerName">Nombre completo</label>
+
+      <input
+        id="registerName"
+        type="text"
+        placeholder="Nombre completo"
+        required
+      >
+
+      <label for="registerEmail">Correo electrónico</label>
+
+      <input
+        id="registerEmail"
+        type="email"
+        placeholder="correo@ejemplo.com"
+        required
+      >
+
+      <label for="registerPassword">Contraseña</label>
+
+      <input
+        id="registerPassword"
+        type="password"
+        placeholder="Mínimo 6 caracteres"
+        minlength="6"
+        required
+      >
+
+      <label for="registerPassword2">Confirmar contraseña</label>
+
+      <input
+        id="registerPassword2"
+        type="password"
+        placeholder="Repite tu contraseña"
+        minlength="6"
+        required
+      >
+
+      <button id="createAccountButton" type="submit">
+        Crear cuenta
+      </button>
+
+      <button
+        id="backLoginButton"
+        type="button"
+        class="forgot"
+      >
+        Volver a iniciar sesión
+      </button>
+
+      <div id="registerMessage" class="message"></div>
+
+    </form>
+  </div>
+
+
+  <!-- RECUPERAR CONTRASEÑA -->
+  <div id="forgotCard" class="card hidden">
+
+    <div class="logo">🔐</div>
+
+    <h1>Recuperar contraseña</h1>
+
+    <div class="subtitle">
+      Te enviaremos un enlace para crear una nueva contraseña
+    </div>
+
+    <form id="forgotForm">
+
+      <label for="forgotEmail">Correo electrónico</label>
+
+      <input
+        id="forgotEmail"
+        type="email"
+        placeholder="correo@ejemplo.com"
+        required
+      >
+
+      <button id="resetButton" type="submit">
+        Enviar enlace
+      </button>
+
+      <button
+        id="backFromForgot"
+        type="button"
+        class="forgot"
+      >
+        Volver a iniciar sesión
+      </button>
+
+      <div id="forgotMessage" class="message"></div>
+
+    </form>
+  </div>
+
+
+  <!-- CAMBIAR CONTRASEÑA -->
+  <div id="updatePasswordCard" class="card hidden">
+
+    <div class="logo">🔑</div>
+
+    <h1>Nueva contraseña</h1>
+
+    <div class="subtitle">
+      Crea una nueva contraseña para tu cuenta
+    </div>
+
+    <form id="updatePasswordForm">
+
+      <label for="newPassword">Nueva contraseña</label>
+
+      <input
+        id="newPassword"
+        type="password"
+        placeholder="Mínimo 6 caracteres"
+        minlength="6"
+        required
+      >
+
+      <label for="newPassword2">Confirmar contraseña</label>
+
+      <input
+        id="newPassword2"
+        type="password"
+        placeholder="Repite tu contraseña"
+        minlength="6"
+        required
+      >
+
+      <button id="updatePasswordButton" type="submit">
+        Cambiar contraseña
+      </button>
+
+      <div id="updateMessage" class="message"></div>
+
+    </form>
+  </div>
+
+
+  <!-- DASHBOARD -->
   <div id="dashboardCard" class="card dashboard hidden">
 
     <div class="logo">✅</div>
@@ -219,36 +406,85 @@
   const loginCard =
     document.getElementById("loginCard");
 
+  const registerCard =
+    document.getElementById("registerCard");
+
+  const forgotCard =
+    document.getElementById("forgotCard");
+
+  const updatePasswordCard =
+    document.getElementById("updatePasswordCard");
+
   const dashboardCard =
     document.getElementById("dashboardCard");
+
 
   const loginForm =
     document.getElementById("loginForm");
 
-  const loginButton =
-    document.getElementById("loginButton");
+  const registerForm =
+    document.getElementById("registerForm");
+
+  const forgotForm =
+    document.getElementById("forgotForm");
+
+  const updatePasswordForm =
+    document.getElementById("updatePasswordForm");
+
 
   const message =
     document.getElementById("message");
 
-  const welcome =
-    document.getElementById("welcome");
+  const registerMessage =
+    document.getElementById("registerMessage");
 
-  const role =
-    document.getElementById("role");
+  const forgotMessage =
+    document.getElementById("forgotMessage");
 
-  const logoutButton =
-    document.getElementById("logoutButton");
+  const updateMessage =
+    document.getElementById("updateMessage");
 
+
+  function showOnly(card) {
+
+    loginCard.classList.add("hidden");
+    registerCard.classList.add("hidden");
+    forgotCard.classList.add("hidden");
+    updatePasswordCard.classList.add("hidden");
+    dashboardCard.classList.add("hidden");
+
+    card.classList.remove("hidden");
+  }
+
+
+  function clearMessages() {
+
+    message.textContent = "";
+    registerMessage.textContent = "";
+    forgotMessage.textContent = "";
+    updateMessage.textContent = "";
+
+    message.classList.remove("success");
+    registerMessage.classList.remove("success");
+    forgotMessage.classList.remove("success");
+    updateMessage.classList.remove("success");
+  }
+
+
+  // LOGIN
 
   loginForm.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
-    message.textContent = "";
+    clearMessages();
+
+    const loginButton =
+      document.getElementById("loginButton");
 
     loginButton.disabled = true;
     loginButton.textContent = "Entrando...";
+
 
     const email =
       document.getElementById("email").value.trim();
@@ -267,10 +503,11 @@
     if (error) {
 
       message.textContent =
-        "Correo o contraseña incorrectos.";
+        error.message;
 
       loginButton.disabled = false;
-      loginButton.textContent = "Iniciar sesión";
+      loginButton.textContent =
+        "Iniciar sesión";
 
       return;
     }
@@ -280,6 +517,8 @@
 
   });
 
+
+  // CARGAR PERFIL
 
   async function loadProfile(userId) {
 
@@ -296,55 +535,378 @@
       message.textContent =
         "No se pudo cargar tu perfil.";
 
-      loginButton.disabled = false;
-      loginButton.textContent = "Iniciar sesión";
+      return;
+    }
+
+
+    showOnly(dashboardCard);
+
+
+    document.getElementById("welcome").textContent =
+      "Hola, " + data.full_name + " 👋";
+
+
+    document.getElementById("role").textContent =
+      data.role === "admin"
+        ? "Administrador"
+        : "Empleado";
+
+  }
+
+
+  // MOSTRAR REGISTRO
+
+  document
+    .getElementById("registerButton")
+    .addEventListener("click", () => {
+
+      clearMessages();
+      registerForm.reset();
+      showOnly(registerCard);
+
+    });
+
+
+  // CREAR CUENTA
+
+  registerForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    clearMessages();
+
+    const button =
+      document.getElementById("createAccountButton");
+
+    const fullName =
+      document.getElementById("registerName")
+        .value
+        .trim();
+
+    const email =
+      document.getElementById("registerEmail")
+        .value
+        .trim();
+
+    const password =
+      document.getElementById("registerPassword")
+        .value;
+
+    const password2 =
+      document.getElementById("registerPassword2")
+        .value;
+
+
+    if (password !== password2) {
+
+      registerMessage.textContent =
+        "Las contraseñas no coinciden.";
 
       return;
     }
 
 
-    loginCard.classList.add("hidden");
-    dashboardCard.classList.remove("hidden");
+    if (password.length < 6) {
 
+      registerMessage.textContent =
+        "La contraseña debe tener al menos 6 caracteres.";
 
-    welcome.textContent =
-      "Hola, " + data.full_name + " 👋";
-
-
-    if (data.role === "admin") {
-
-      role.textContent =
-        "Administrador";
-
-    } else {
-
-      role.textContent =
-        "Empleado";
+      return;
     }
 
-  }
+
+    button.disabled = true;
+    button.textContent = "Creando cuenta...";
 
 
-  logoutButton.addEventListener("click", async () => {
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
 
-    await supabaseClient.auth.signOut();
 
-    dashboardCard.classList.add("hidden");
-    loginCard.classList.remove("hidden");
+    if (error) {
 
-    document.getElementById("password").value = "";
+      registerMessage.textContent =
+        error.message;
 
-    loginButton.disabled = false;
-    loginButton.textContent = "Iniciar sesión";
+      button.disabled = false;
+      button.textContent =
+        "Crear cuenta";
+
+      return;
+    }
+
+
+    if (data.user) {
+
+      const { error: profileError } =
+        await supabaseClient
+          .from("profiles")
+          .upsert({
+            id: data.user.id,
+            full_name: fullName,
+            role: "employee"
+          });
+
+
+      if (profileError) {
+
+        registerMessage.textContent =
+          "La cuenta fue creada, pero no se pudo crear el perfil.";
+
+        button.disabled = false;
+        button.textContent =
+          "Crear cuenta";
+
+        return;
+      }
+    }
+
+
+    registerMessage.classList.add("success");
+
+    registerMessage.textContent =
+      data.session
+        ? "Cuenta creada correctamente."
+        : "Cuenta creada. Revisa tu correo para confirmar la cuenta.";
+
+
+    button.disabled = false;
+    button.textContent =
+      "Crear cuenta";
 
   });
 
+
+  // RECUPERAR CONTRASEÑA
+
+  document
+    .getElementById("forgotButton")
+    .addEventListener("click", () => {
+
+      clearMessages();
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      document.getElementById("forgotEmail").value =
+        email;
+
+      showOnly(forgotCard);
+
+    });
+
+
+  forgotForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    clearMessages();
+
+    const button =
+      document.getElementById("resetButton");
+
+    const email =
+      document.getElementById("forgotEmail")
+        .value
+        .trim();
+
+
+    button.disabled = true;
+    button.textContent =
+      "Enviando...";
+
+
+    const redirectUrl =
+      window.location.origin +
+      window.location.pathname;
+
+
+    const { error } =
+      await supabaseClient.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: redirectUrl
+        }
+      );
+
+
+    if (error) {
+
+      forgotMessage.textContent =
+        error.message;
+
+      button.disabled = false;
+      button.textContent =
+        "Enviar enlace";
+
+      return;
+    }
+
+
+    forgotMessage.classList.add("success");
+
+    forgotMessage.textContent =
+      "Listo. Revisa tu correo para cambiar la contraseña.";
+
+
+    button.disabled = false;
+    button.textContent =
+      "Enviar enlace";
+
+  });
+
+
+  // VOLVER DESDE RECUPERACIÓN
+
+  document
+    .getElementById("backFromForgot")
+    .addEventListener("click", () => {
+
+      clearMessages();
+      showOnly(loginCard);
+
+    });
+
+
+  // VOLVER DESDE REGISTRO
+
+  document
+    .getElementById("backLoginButton")
+    .addEventListener("click", () => {
+
+      clearMessages();
+      showOnly(loginCard);
+
+    });
+
+
+  // CAMBIAR CONTRASEÑA
+
+  updatePasswordForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    clearMessages();
+
+    const button =
+      document.getElementById("updatePasswordButton");
+
+    const password =
+      document.getElementById("newPassword")
+        .value;
+
+    const password2 =
+      document.getElementById("newPassword2")
+        .value;
+
+
+    if (password !== password2) {
+
+      updateMessage.textContent =
+        "Las contraseñas no coinciden.";
+
+      return;
+    }
+
+
+    button.disabled = true;
+    button.textContent =
+      "Guardando...";
+
+
+    const { error } =
+      await supabaseClient.auth.updateUser({
+        password: password
+      });
+
+
+    if (error) {
+
+      updateMessage.textContent =
+        error.message;
+
+      button.disabled = false;
+      button.textContent =
+        "Cambiar contraseña";
+
+      return;
+    }
+
+
+    updateMessage.classList.add("success");
+
+    updateMessage.textContent =
+      "Contraseña cambiada correctamente.";
+
+
+    button.disabled = false;
+    button.textContent =
+      "Cambiar contraseña";
+
+  });
+
+
+  // DETECTAR ENLACE DE RECUPERACIÓN
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+      if (event === "PASSWORD_RECOVERY") {
+
+        clearMessages();
+        showOnly(updatePasswordCard);
+
+        return;
+      }
+
+      if (event === "SIGNED_IN" && session) {
+
+        if (
+          !updatePasswordCard.classList.contains("hidden")
+        ) {
+          return;
+        }
+
+        await loadProfile(session.user.id);
+      }
+
+    }
+  );
+
+
+  // CERRAR SESIÓN
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener("click", async () => {
+
+      await supabaseClient.auth.signOut();
+
+      document.getElementById("password").value = "";
+
+      clearMessages();
+
+      showOnly(loginCard);
+
+    });
+
+
+  // COMPROBAR SESIÓN EXISTENTE
 
   async function checkSession() {
 
     const {
       data: { session }
-    } = await supabaseClient.auth.getSession();
+    } =
+      await supabaseClient.auth.getSession();
 
 
     if (session) {
@@ -356,69 +918,7 @@
   }
 
 
-const registerButton = document.createElement("button");
-
-registerButton.textContent = "Crear cuenta";
-registerButton.style.marginTop = "12px";
-registerButton.style.background = "#16a34a";
-
-loginForm.appendChild(registerButton);
-
-registerButton.addEventListener("click", async (event) => {
-
-  event.preventDefault();
-
-  const fullName = prompt("Escribe tu nombre completo:");
-  if (!fullName) return;
-
-  const email = prompt("Escribe tu correo electrónico:");
-  if (!email) return;
-
-  const password = prompt("Crea una contraseña:");
-  if (!password) return;
-
-  registerButton.disabled = true;
-  registerButton.textContent = "Creando cuenta...";
-
-  const { data, error } =
-    await supabaseClient.auth.signUp({
-      email: email.trim(),
-      password: password
-    });
-
-  if (error) {
-    message.textContent = error.message;
-    registerButton.disabled = false;
-    registerButton.textContent = "Crear cuenta";
-    return;
-  }
-
-  if (data.user) {
-
-    const { error: profileError } =
-      await supabaseClient
-        .from("profiles")
-        .insert({
-          id: data.user.id,
-          full_name: fullName.trim(),
-          role: "employee"
-        });
-
-    if (profileError) {
-      message.textContent =
-        "Cuenta creada, pero hubo un problema creando tu perfil.";
-      return;
-    }
-  }
-
-  message.style.color = "#16a34a";
-  message.textContent =
-    "Cuenta creada correctamente. Ya puedes iniciar sesión.";
-
-  registerButton.disabled = false;
-  registerButton.textContent = "Crear cuenta";
-
-});  checkSession();
+  checkSession();
 
 </script>
 
