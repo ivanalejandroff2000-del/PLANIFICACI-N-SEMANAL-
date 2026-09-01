@@ -140,7 +140,6 @@
 
 <div class="container">
 
-  <!-- LOGIN -->
   <div id="loginCard" class="card">
 
     <div class="logo">📅</div>
@@ -154,6 +153,7 @@
     <form id="loginForm">
 
       <label for="email">Correo electrónico</label>
+
       <input
         id="email"
         type="email"
@@ -162,6 +162,7 @@
       >
 
       <label for="password">Contraseña</label>
+
       <input
         id="password"
         type="password"
@@ -179,7 +180,6 @@
   </div>
 
 
-  <!-- DASHBOARD -->
   <div id="dashboardCard" class="card dashboard hidden">
 
     <div class="logo">✅</div>
@@ -203,10 +203,6 @@
 
 <script>
 
-  // ================================
-  // CONEXIÓN CON SUPABASE
-  // ================================
-
   const SUPABASE_URL =
     "https://ousitsihfmjbnlsbtpk.supabase.co";
 
@@ -219,10 +215,6 @@
       SUPABASE_KEY
     );
 
-
-  // ================================
-  // ELEMENTOS
-  // ================================
 
   const loginCard =
     document.getElementById("loginCard");
@@ -248,10 +240,6 @@
   const logoutButton =
     document.getElementById("logoutButton");
 
-
-  // ================================
-  // INICIAR SESIÓN
-  // ================================
 
   loginForm.addEventListener("submit", async (event) => {
 
@@ -292,10 +280,6 @@
 
   });
 
-
-  // ================================
-  // CARGAR PERFIL
-  // ================================
 
   async function loadProfile(userId) {
 
@@ -341,10 +325,6 @@
   }
 
 
-  // ================================
-  // CERRAR SESIÓN
-  // ================================
-
   logoutButton.addEventListener("click", async () => {
 
     await supabaseClient.auth.signOut();
@@ -359,10 +339,6 @@
 
   });
 
-
-  // ================================
-  // COMPROBAR SESIÓN EXISTENTE
-  // ================================
 
   async function checkSession() {
 
