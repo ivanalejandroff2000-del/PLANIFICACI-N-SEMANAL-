@@ -1044,7 +1044,11 @@ async function loadAvailability() {
     !!data.saturday;
 
   document.getElementById("availSunday").checked =
-    !!data.sunday;
+    !!data.sunday; 
+  if (data.confirmed) {
+  document.querySelectorAll('#availabilityBox input[type="checkbox"]')
+    .forEach(input => input.disabled = true);
+}
 }
 
 
@@ -1122,7 +1126,7 @@ document
           "availSunday"
         ).checked,
 
-      confirmed: false
+      confirmed: true
     };
 
 
@@ -1155,6 +1159,8 @@ document
       msg.textContent =
         "Disponibilidad guardada correctamente. ✅";
     }
+    document.querySelectorAll('#availabilityBox input[type="checkbox"]')
+  .forEach(input => input.disabled = true);
 
 
     button.disabled = false;
