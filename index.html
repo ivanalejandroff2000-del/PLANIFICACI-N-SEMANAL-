@@ -356,7 +356,69 @@
   }
 
 
-  checkSession();
+const registerButton = document.createElement("button");
+
+registerButton.textContent = "Crear cuenta";
+registerButton.style.marginTop = "12px";
+registerButton.style.background = "#16a34a";
+
+loginForm.appendChild(registerButton);
+
+registerButton.addEventListener("click", async (event) => {
+
+  event.preventDefault();
+
+  const fullName = prompt("Escribe tu nombre completo:");
+  if (!fullName) return;
+
+  const email = prompt("Escribe tu correo electrónico:");
+  if (!email) return;
+
+  const password = prompt("Crea una contraseña:");
+  if (!password) return;
+
+  registerButton.disabled = true;
+  registerButton.textContent = "Creando cuenta...";
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email: email.trim(),
+      password: password
+    });
+
+  if (error) {
+    message.textContent = error.message;
+    registerButton.disabled = false;
+    registerButton.textContent = "Crear cuenta";
+    return;
+  }
+
+  if (data.user) {
+
+    const { error: profileError } =
+      await supabaseClient
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          full_name: fullName.trim(),
+          role: "employee"
+        });
+
+    if (profileError) {
+      message.textContent =
+        "Cuenta creada, pero hubo un problema creando tu perfil.";
+      return;
+    }
+  }
+
+  message.style.color = "#16a34a";
+  message.textContent =
+    "Cuenta creada correctamente. Ya puedes iniciar sesión.";
+
+  registerButton.disabled = false;
+  registerButton.textContent = "Crear cuenta";
+
+});  checkSession();
 
 </script>
 
