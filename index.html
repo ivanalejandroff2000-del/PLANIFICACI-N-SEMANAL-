@@ -1192,6 +1192,229 @@ loadAvailability();
 
 
   checkSession();
+  // ===============================
+// PANEL DE ADMINISTRADOR
+// ===============================
+
+async function prepararPanelAdministrador() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) return;
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  if (!profile || profile.role !== "admin") return;
+
+  if (document.getElementById("adminPanelButton")) return;
+
+  const button = document.createElement("button");
+
+  button.id = "adminPanelButton";
+  button.textContent = "👑 Panel de Administrador";
+  button.style.background = "#7c3aed";
+  button.style.marginTop = "15px";
+
+  const panel = document.createElement("div");
+
+  panel.id = "adminPanel";
+  panel.className = "hidden";
+  panel.style.marginTop = "20px";
+  panel.style.textAlign = "left";
+
+  button.addEventListener("click", async () => {
+
+    panel.classList.toggle("hidden");
+
+    if (!panel.innerHTML) {
+
+      panel.innerHTML = `
+        <div style="
+          background:#f8fafc;
+          padding:18px;
+          border-radius:16px;
+          border:1px solid #e5e7eb;
+        ">
+
+          <h2 style="margin-bottom:12px;">
+            👥 Empleados
+          </h2>
+
+          <label for="adminWeek">
+            Semana:
+          </label>
+
+          <input
+            id="adminWeek"
+            type="date"
+            style="margin-bottom:12px;"
+          >
+
+          <div id="adminEmployees">
+            Cargando empleados...
+          </div>
+
+        </div>
+      `;
+
+      document.getElementById("adminWeek").value =
+        getMonday();
+
+      document.getElementById("adminWeek")
+        .addEventListener(
+          "change",
+          cargarEmpleadosAdmin
+        );
+
+      await cargarEmpleadosAdmin();
+    }
+  });
+
+  dashboardCard.insertBefore(
+    button,
+    dashboardCard.querySelector("#logoutButton")
+  );
+
+  dashboardCard.insertBefore(
+    panel,
+    dashboardCard.querySelector("#logoutButton")
+  );
+}
+
+
+async function cargarEmpleadosAdmin() {
+
+  const container =
+    document.getElementById("adminEmployees");
+
+  const weekInput =
+    document.getElementById("adminWeek");
+
+  if (!container || !weekInput) return;
+
+  container.innerHTML = "Cargando...";
+
+  const weekStart = weekInput.value;
+
+  const { data: employees, error: employeesError } =
+    await supabaseClient
+      .from("profiles")
+      .select("id, full_name, role")
+      .eq("role", "employee")
+      .order("full_name");
+
+  if (employeesError) {
+
+    container.innerHTML =
+      "Error cargando empleados: " +
+      employeesError.message;
+
+    return;
+  }
+
+  const { data: availability, error: availabilityError } =
+    await supabaseClient
+      .from("weekly_availability")
+      .select("*")
+      .eq("week_start", weekStart);
+
+  if (availabilityError) {
+
+    container.innerHTML =
+      "Error cargando disponibilidad: " +
+      availabilityError.message;
+
+    return;
+  }
+
+  if (!employees || employees.length === 0) {
+
+    container.innerHTML =
+      "No hay empleados registrados.";
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  employees.forEach(employee => {
+
+    const record =
+      availability?.find(
+        item => item.employee_id === employee.id
+      );
+
+    const days = [
+      ["Lun", record?.monday],
+      ["Mar", record?.tuesday],
+      ["Mié", record?.wednesday],
+      ["Jue", record?.thursday],
+      ["Vie", record?.friday],
+      ["Sáb", record?.saturday],
+      ["Dom", record?.sunday]
+    ];
+
+    const card = document.createElement("div");
+
+    card.style.background = "white";
+    card.style.padding = "14px";
+    card.style.borderRadius = "14px";
+    card.style.marginBottom = "12px";
+    card.style.border = "1px solid #e5e7eb";
+
+    card.innerHTML = `
+      <strong style="font-size:17px;">
+        ${employee.full_name || "Sin nombre"}
+      </strong>
+
+      <div style="margin-top:8px;">
+
+        ${days.map(day => `
+          <span style="
+            display:inline-block;
+            padding:5px 8px;
+            margin:2px;
+            border-radius:8px;
+            background:${day[1] ? "#dcfce7" : "#f1f5f9"};
+            color:${day[1] ? "#166534" : "#64748b"};
+            font-size:12px;
+          ">
+            ${day[0]} ${day[1] ? "✓" : "—"}
+          </span>
+        `).join("")}
+
+      </div>
+
+      <div style="
+        margin-top:8px;
+        font-size:13px;
+        font-weight:600;
+      ">
+        ${record?.confirmed
+          ? "✅ Confirmado"
+          : "⏳ Pendiente"}
+      </div>
+    `;
+
+    container.appendChild(card);
+
+  });
+}
+
+
+supabaseClient.auth.onAuthStateChange(() => {
+
+  setTimeout(() => {
+    prepararPanelAdministrador();
+  }, 300);
+
+});
 
 </script>
 
