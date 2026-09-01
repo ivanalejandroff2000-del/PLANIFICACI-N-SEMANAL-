@@ -522,6 +522,8 @@
 
   async function loadProfile(userId) {
 
+  try {
+
     const { data, error } =
       await supabaseClient
         .from("profiles")
@@ -529,29 +531,49 @@
         .eq("id", userId)
         .single();
 
-
     if (error) {
+      console.error("Error cargando perfil:", error);
 
       message.textContent =
-        "No se pudo cargar tu perfil.";
+        "No se pudo cargar tu perfil: " + error.message;
 
+      const loginButton =
+        document.getElementById("loginButton");
+
+      loginButton.disabled = false;
+      loginButton.textContent = "Iniciar sesión";
+
+      showOnly(loginCard);
       return;
     }
 
-
     showOnly(dashboardCard);
 
-
     document.getElementById("welcome").textContent =
-      "Hola, " + data.full_name + " 👋";
-
+      "Hola, " + (data.full_name || "Usuario") + " 👋";
 
     document.getElementById("role").textContent =
       data.role === "admin"
         ? "Administrador"
         : "Empleado";
 
+  } catch (err) {
+
+    console.error("Error inesperado:", err);
+
+    showOnly(loginCard);
+
+    message.textContent =
+      "Ocurrió un error al cargar la aplicación.";
+
+    const loginButton =
+      document.getElementById("loginButton");
+
+    loginButton.disabled = false;
+    loginButton.textContent = "Iniciar sesión";
   }
+
+}
 
 
   // MOSTRAR REGISTRO
