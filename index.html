@@ -920,7 +920,252 @@
 
     });
 
+// DISPONIBILIDAD SEMANAL
 
+const availabilityHTML = `
+  <div id="availabilityBox" style="margin-top:25px;text-align:left;">
+
+    <h2 style="font-size:20px;margin-bottom:8px;">
+      📅 Disponibilidad semanal
+    </h2>
+
+    <p style="color:#6b7280;font-size:14px;margin-bottom:15px;">
+      Selecciona los días que estás disponible para trabajar.
+    </p>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Lunes
+      <input id="availMonday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Martes
+      <input id="availTuesday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Miércoles
+      <input id="availWednesday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Jueves
+      <input id="availThursday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Viernes
+      <input id="availFriday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;">
+      Sábado
+      <input id="availSaturday" type="checkbox">
+    </label>
+
+    <label style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:15px;">
+      Domingo
+      <input id="availSunday" type="checkbox">
+    </label>
+
+    <button id="saveAvailabilityButton" type="button">
+      Guardar disponibilidad
+    </button>
+
+    <div id="availabilityMessage" class="message"></div>
+
+  </div>
+`;
+
+document
+  .getElementById("logoutButton")
+  .insertAdjacentHTML("beforebegin", availabilityHTML);
+
+
+function getMonday() {
+
+  const date = new Date();
+  const day = date.getDay();
+
+  const diff = day === 0 ? -6 : 1 - day;
+
+  date.setDate(date.getDate() + diff);
+
+  return date.toISOString().split("T")[0];
+}
+
+
+async function loadAvailability() {
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const weekStart = getMonday();
+
+  const { data, error } =
+    await supabaseClient
+      .from("weekly_availability")
+      .select("*")
+      .eq("employee_id", user.id)
+      .eq("week_start", weekStart)
+      .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      "Error cargando disponibilidad:",
+      error
+    );
+
+    return;
+  }
+
+  if (!data) return;
+
+  document.getElementById("availMonday").checked =
+    !!data.monday;
+
+  document.getElementById("availTuesday").checked =
+    !!data.tuesday;
+
+  document.getElementById("availWednesday").checked =
+    !!data.wednesday;
+
+  document.getElementById("availThursday").checked =
+    !!data.thursday;
+
+  document.getElementById("availFriday").checked =
+    !!data.friday;
+
+  document.getElementById("availSaturday").checked =
+    !!data.saturday;
+
+  document.getElementById("availSunday").checked =
+    !!data.sunday;
+}
+
+
+document
+  .getElementById("saveAvailabilityButton")
+  .addEventListener("click", async () => {
+
+    const button =
+      document.getElementById(
+        "saveAvailabilityButton"
+      );
+
+    const msg =
+      document.getElementById(
+        "availabilityMessage"
+      );
+
+    button.disabled = true;
+    button.textContent = "Guardando...";
+
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+      msg.textContent =
+        "La sesión expiró. Inicia sesión nuevamente.";
+
+      button.disabled = false;
+      button.textContent =
+        "Guardar disponibilidad";
+
+      return;
+    }
+
+    const payload = {
+
+      employee_id: user.id,
+
+      week_start: getMonday(),
+
+      monday:
+        document.getElementById(
+          "availMonday"
+        ).checked,
+
+      tuesday:
+        document.getElementById(
+          "availTuesday"
+        ).checked,
+
+      wednesday:
+        document.getElementById(
+          "availWednesday"
+        ).checked,
+
+      thursday:
+        document.getElementById(
+          "availThursday"
+        ).checked,
+
+      friday:
+        document.getElementById(
+          "availFriday"
+        ).checked,
+
+      saturday:
+        document.getElementById(
+          "availSaturday"
+        ).checked,
+
+      sunday:
+        document.getElementById(
+          "availSunday"
+        ).checked,
+
+      confirmed: false
+    };
+
+
+    const { error } =
+      await supabaseClient
+        .from("weekly_availability")
+        .upsert(
+          payload,
+          {
+            onConflict:
+              "employee_id,week_start"
+          }
+        );
+
+
+    if (error) {
+
+      console.error(error);
+
+      msg.classList.remove("success");
+
+      msg.textContent =
+        "No se pudo guardar: " +
+        error.message;
+
+    } else {
+
+      msg.classList.add("success");
+
+      msg.textContent =
+        "Disponibilidad guardada correctamente. ✅";
+    }
+
+
+    button.disabled = false;
+
+    button.textContent =
+      "Guardar disponibilidad";
+
+  });
+
+
+loadAvailability();
   // COMPROBAR SESIÓN EXISTENTE
 
   async function checkSession() {
